@@ -233,7 +233,6 @@ EM_UNIDADE = {"Ovos"}
 # Rendimento que a planilha não dá em gramas.
 RENDIMENTO_MANUAL = {
     "Molho roti": 5500.0,  # "5 A 6 LT" -> 5,5 l ~ 5.500 g
-    "Arroz de polvo mediterrâneo": 418.0,  # planilha diz 309; confirmado 418 (soma dos ingredientes)
 }
 
 # Alérgenos declarados em "Outras orientações".
