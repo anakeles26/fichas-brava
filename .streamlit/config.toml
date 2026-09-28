@@ -1,0 +1,12 @@
+[theme]
+# Paleta "Metas Batidas" do Grupo HosT — verde escuro + dourado (peça de
+# marketing enviada pela Ana), substituindo o rosa/azul do site institucional
+# usado antes. Ver src/fichahost/ui.py (VERDE/DOURADO) pros mesmos tons
+# usados nos ícones e badges customizados.
+# secondaryBackgroundColor vira o fundo da sidebar no Streamlit (ver src/fichahost/ui.py
+# para o ajuste de contraste do texto dentro dela).
+primaryColor = "#1B4332"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#0F2818"
+textColor = "#1A1A1A"
+font = "sans serif"
