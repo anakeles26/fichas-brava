@@ -1,11 +1,11 @@
 [theme]
-# Paleta padrão do app: verde escuro + dourado. Mude à vontade — as mesmas
-# cores estão em src/fichabase/ui.py (VERDE/DOURADO), usadas nos ícones e nas
+# Paleta do Fichas Brava: vinho forte + dourado. Mude à vontade — as mesmas
+# cores estão em src/fichabase/ui.py (VINHO/DOURADO), usadas nos ícones e nas
 # etiquetas coloridas.
 # secondaryBackgroundColor vira o fundo do menu lateral no Streamlit (ver
 # src/fichabase/ui.py para o ajuste de contraste do texto dentro dele).
-primaryColor = "#1B4332"
+primaryColor = "#6D1A2B"
 backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#0F2818"
+secondaryBackgroundColor = "#3D0A16"
 textColor = "#1A1A1A"
 font = "sans serif"

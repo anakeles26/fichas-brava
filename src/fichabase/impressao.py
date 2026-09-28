@@ -90,7 +90,7 @@ def html_impressao(
     if validades:
         itens_validade = "".join(f"<li>{escape(rotulo)}: <b>{escape(dias)}</b></li>" for rotulo, dias in validades)
         blocos += ["<h2>Validade</h2>", f'<ul class="validade">{itens_validade}</ul>']
-    blocos.append('<div class="rodape">FichaBase</div>')
+    blocos.append('<div class="rodape">Fichas Brava</div>')
 
     return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8">
@@ -107,10 +107,10 @@ def html_impressao(
   }}
   .barra button {{
     display: inline-flex; align-items: center; gap: 6px; font: 600 14px "Source Sans Pro", Arial, sans-serif;
-    padding: 8px 16px; cursor: pointer; border-radius: 8px; border: 1px solid #1B4332;
-    background: #1B4332; color: #fff;
+    padding: 8px 16px; cursor: pointer; border-radius: 8px; border: 1px solid #6D1A2B;
+    background: #6D1A2B; color: #fff;
   }}
-  .barra button:hover {{ background: #2D6A4F; border-color: #2D6A4F; }}
+  .barra button:hover {{ background: #8C2438; border-color: #8C2438; }}
   .barra svg {{ width: 18px; height: 18px; fill: currentColor; }}
   #doc {{ display: none; }}
   @media print {{
@@ -144,10 +144,10 @@ def html_impressao(
 
   /* A4 (Brother L8900): tabela com linhas, título grande, cor só no cabeçalho. */
   body.a4 #doc {{ font-size: 11pt; }}
-  body.a4 h1 {{ font-size: 20pt; color: #1E4D33; }}
-  body.a4 .cab {{ border-bottom: 2px solid #1E4D33; padding-bottom: 6px; margin-bottom: 6px; }}
+  body.a4 h1 {{ font-size: 20pt; color: #6D1A2B; }}
+  body.a4 .cab {{ border-bottom: 2px solid #6D1A2B; padding-bottom: 6px; margin-bottom: 6px; }}
   body.a4 .meta {{ color: #333; }}
-  body.a4 h2 {{ font-size: 11pt; color: #1E4D33; margin-top: 14px; }}
+  body.a4 h2 {{ font-size: 11pt; color: #6D1A2B; margin-top: 14px; }}
   body.a4 td {{ border-bottom: 1px solid #ccc; padding: 3px 2px; }}
   body.a4 tr, body.a4 li {{ page-break-inside: avoid; }}
   body.a4 h2 {{ page-break-after: avoid; }}

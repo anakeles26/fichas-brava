@@ -28,7 +28,7 @@ def enviar_senha_provisoria(nome: str, email: str, senha: str) -> None:
 
     corpo_html = f"""
         <p>Olá, {nome}!</p>
-        <p>Sua conta no <strong>FichaBase</strong> (sistema de fichas técnicas) foi criada.
+        <p>Sua conta no <strong>Fichas Brava</strong> (sistema de fichas técnicas) foi criada.
         Use os dados abaixo para o primeiro acesso:</p>
         <p><strong>Email:</strong> {email}<br>
         <strong>Senha provisória:</strong> {senha}</p>
@@ -38,7 +38,7 @@ def enviar_senha_provisoria(nome: str, email: str, senha: str) -> None:
         {
             "from": settings.resend_from,
             "to": [email],
-            "subject": "Seu acesso ao FichaBase",
+            "subject": "Seu acesso ao Fichas Brava",
             "html": corpo_html,
         }
     ).encode("utf-8")

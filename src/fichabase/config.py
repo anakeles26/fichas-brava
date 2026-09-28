@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     # pra mandar pra qualquer destinatário — "onboarding@resend.dev" só
     # entrega pro próprio e-mail dono da conta Resend.
     resend_api_key: str = ""
-    resend_from: str = "FichaBase <onboarding@resend.dev>"
+    resend_from: str = "Fichas Brava <onboarding@resend.dev>"
 
     # Storage de fotos das fichas técnicas (Supabase Storage) — substitui o
     # disco local (fichabase/fotos.py), que some a cada reinício/deploy no

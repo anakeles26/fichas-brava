@@ -1,4 +1,4 @@
-"""Entrypoint do FichaBase: login + navegação.
+"""Entrypoint do Fichas Brava: login + navegação.
 
 Com `st.navigation`, toda página passa por aqui a cada troca de tela — por
 isso o login, o CSS e o `st.set_page_config` só precisam existir neste
@@ -19,12 +19,12 @@ from fichabase.senha import senha_valida
 from fichabase.ui import (
     aplicar_estilo,
     esconder_sidebar,
-    fundo_verde_login,
+    fundo_login,
     logo,
     logo_centralizada,
 )
 
-st.set_page_config(page_title="FichaBase", page_icon=":material/restaurant_menu:", layout="wide")
+st.set_page_config(page_title="Fichas Brava", page_icon=":material/restaurant_menu:", layout="wide")
 aplicar_estilo()
 
 # Placeholder criado ANTES do formulário de login (authenticator.login, logo
@@ -53,14 +53,14 @@ status = st.session_state.get("authentication_status")
 
 if status is False:
     esconder_sidebar()
-    fundo_verde_login()
+    fundo_login()
     with topo_login.container():
         logo_centralizada()
     st.error("Email ou senha incorretos.")
     st.stop()
 elif status is None:
     esconder_sidebar()
-    fundo_verde_login()
+    fundo_login()
     with topo_login.container():
         logo_centralizada()
     st.caption("Sistema de fichas técnicas")

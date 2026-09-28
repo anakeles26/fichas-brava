@@ -70,7 +70,7 @@ def gerar_planilha_modelo() -> bytes:
     aba.append(list(COLUNAS_MODELO))
     for celula in aba[1]:
         celula.font = Font(name="Arial", bold=True, color="FFFFFF")
-        celula.fill = PatternFill("solid", fgColor="1B4332")  # verde da marca
+        celula.fill = PatternFill("solid", fgColor="6D1A2B")  # vinho da marca
         celula.alignment = Alignment(horizontal="center")
     aba.column_dimensions["A"].width = 38
     aba.column_dimensions["B"].width = 14

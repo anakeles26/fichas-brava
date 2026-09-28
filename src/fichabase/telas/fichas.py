@@ -128,7 +128,7 @@ def _foto_detalhe_html(src: str) -> str:
     return (
         '<div style="position:relative;border-radius:10px;overflow:hidden;background:#F1F3F6;">'
         f'<img src="{src}" style="width:100%;height:auto;max-height:480px;object-fit:contain;display:block;margin:0 auto;">'
-        '<span style="position:absolute;top:10px;right:10px;background:rgba(15,40,24,0.75);color:#fff;'
+        '<span style="position:absolute;top:10px;right:10px;background:rgba(61,10,22,0.75);color:#fff;'
         f'border-radius:999px;padding:6px;display:flex;">{icone("zoom_in")}</span></div>'
     )
 

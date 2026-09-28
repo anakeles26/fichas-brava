@@ -7,20 +7,22 @@ sem rerodar `app.py`, então o ajuste de estilo precisa ser repetido em cada uma
 
 from __future__ import annotations
 
+import base64
 import datetime as dt
 import re
 import unicodedata
+from functools import lru_cache
+from pathlib import Path
 
 import streamlit as st
 
-# Paleta padrão do app — verde escuro + dourado. Trocar aqui (e no
-# .streamlit/config.toml) muda as cores de todo o sistema.
-# o rosa/azul usado antes. Os nomes das variáveis mudaram (ROSA->VERDE,
-# AZUL->DOURADO) mas as classes CSS .fh-badge-rosa/.fh-badge-azul mantiveram
-# o nome antigo de propósito: são só chaves internas usadas em dezenas de
-# chamadas de badge() espalhadas pelas páginas — trocar o nome delas também
-# exigiria editar cada uma dessas chamadas sem nenhum ganho visual.
-VERDE = "#1B4332"
+# Paleta do Fichas Brava — vinho forte + dourado. Trocar aqui (e no
+# .streamlit/config.toml) muda as cores de todo o sistema. As classes CSS
+# .fh-badge-rosa/.fh-badge-azul mantêm o nome antigo de propósito: são só
+# chaves internas usadas em dezenas de chamadas de badge() espalhadas pelas
+# páginas — renomear exigiria editar cada chamada sem nenhum ganho visual.
+VINHO = "#6D1A2B"
+VINHO_ESCURO = "#3D0A16"
 DOURADO = "#C9A961"
 
 _MESES_PT = {
@@ -117,16 +119,16 @@ def aplicar_estilo() -> None:
         }}
 
         /* Área de envio de arquivo (foto da ficha, planilha de insumos): o
-        mesmo secondaryBackgroundColor escuro deixava o quadro verde-escuro com
+        mesmo secondaryBackgroundColor escuro deixava o quadro vinho-escuro com
         o texto ilegível. Fundo claro, borda tracejada e texto cinza. */
         [data-testid="stFileUploaderDropzone"] {{
-            background-color: #F7F9F8 !important;
-            border: 1.5px dashed #C9D3CD !important;
+            background-color: #FBF6F7 !important;
+            border: 1.5px dashed #E3C9CF !important;
             border-radius: 10px !important;
         }}
         [data-testid="stFileUploaderDropzone"]:hover {{
-            border-color: {VERDE} !important;
-            background-color: #EEF4F0 !important;
+            border-color: {VINHO} !important;
+            background-color: #F6E4E8 !important;
         }}
         [data-testid="stFileUploaderDropzoneInstructions"],
         [data-testid="stFileUploaderDropzoneInstructions"] * {{
@@ -134,7 +136,7 @@ def aplicar_estilo() -> None:
         }}
         [data-testid="stFileUploaderDropzone"] button {{
             background-color: #FFFFFF !important;
-            color: {VERDE} !important;
+            color: {VINHO} !important;
             border: 1px solid #D8DCE3 !important;
         }}
         [data-testid="stFileUploader"] [data-testid="stFileUploaderFile"],
@@ -185,9 +187,9 @@ def aplicar_estilo() -> None:
         }}
 
         /* Barra de progresso (Auditorias): o trilho herda a cor secundária
-           escura do tema e some contra o preenchimento verde — clareia. */
+           escura do tema e some contra o preenchimento vinho — clareia. */
         [data-testid="stProgressBarTrack"] {{
-            background-color: #E3EDE7 !important;
+            background-color: #F1DDE1 !important;
         }}
 
         /* Botão "Salvar Ficha Técnica" no rodapé do modo de edição
@@ -224,7 +226,7 @@ def aplicar_estilo() -> None:
             margin-right: 6px;
             white-space: nowrap;
         }}
-        .fh-badge-rosa {{ background: #E3ECE6; color: {VERDE}; }}
+        .fh-badge-rosa {{ background: #F6E4E8; color: {VINHO}; }}
         .fh-badge-azul {{ background: #F5EAD3; color: #8A6D1F; }}
         .fh-badge-verde {{ background: #DCF3E3; color: #1E8449; }}
         .fh-badge-amarelo {{ background: #FCF0D9; color: #92710A; }}
@@ -250,9 +252,9 @@ def aplicar_estilo() -> None:
         }}
         .fh-badge .fh-icon {{ margin-right: 3px; }}
 
-        /* Título "Ficha" + marca. Flex com o texto encolhível: a
+        /* Título "Fichas" + marca. Flex com o texto encolhível: a
         largura da sidebar muda com a tela/zoom do navegador, e com tamanho
-        fixo a marca era cortada. O ícone e o "Ficha" não encolhem; a marca
+        fixo a marca era cortada. O ícone e o "Fichas" não encolhem; a marca
         marca ocupa o que sobrar, mantendo a proporção. */
         .fh-logo {{
             display: flex;
@@ -277,6 +279,18 @@ def aplicar_estilo() -> None:
             height: auto;
         }}
 
+        /* Legenda abaixo da logo em imagem. Classe (e não estilo inline)
+        porque o st.markdown descarta o important do atributo style, e a
+        sidebar força texto claro em tudo. */
+        .fh-logo-legenda,
+        [data-testid="stSidebar"] .fh-logo-legenda {{
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            margin-top: 0.2rem;
+            color: {VINHO} !important;
+        }}
+
         .fh-stat-box {{
             border: 1px solid #E5E7EB;
             border-radius: 10px;
@@ -294,7 +308,7 @@ def aplicar_estilo() -> None:
 # zero em SVG, na cor da marca, no espírito do ícone de app que a Ana pediu.
 _ICONE_LOGO = f"""
 <svg viewBox="0 0 100 100" style="height:2.1rem;vertical-align:-0.5rem;margin-right:0.4rem;">
-  <rect x="0" y="0" width="100" height="100" rx="22" fill="{VERDE}"/>
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="{VINHO}"/>
   <circle cx="32" cy="46" r="15" fill="#FFFFFF"/>
   <circle cx="68" cy="46" r="15" fill="#FFFFFF"/>
   <ellipse cx="50" cy="40" rx="24" ry="21" fill="#FFFFFF"/>
@@ -304,8 +318,8 @@ _ICONE_LOGO = f"""
 
 
 # Mesmo ícone, mas com o quadrado em dourado — usado só na tela de login,
-# onde o fundo passa a ser o próprio verde da marca (o ícone verde original
-# ficaria invisível, verde sobre verde).
+# onde o fundo passa a ser o próprio vinho da marca (o ícone vinho original
+# ficaria invisível, vinho sobre vinho).
 _ICONE_LOGO_LOGIN = f"""
 <svg viewBox="0 0 100 100" style="height:2.8rem;vertical-align:-0.6rem;margin-right:0.5rem;">
   <rect x="0" y="0" width="100" height="100" rx="22" fill="{DOURADO}"/>
@@ -317,13 +331,13 @@ _ICONE_LOGO_LOGIN = f"""
 """
 
 
-def fundo_verde_login() -> None:
-    """Fundo verde da marca — só na tela de login (não pode ir em
+def fundo_login() -> None:
+    """Fundo vinho da marca — só na tela de login (não pode ir em
     aplicar_estilo, que roda em toda página; as demais usam fundo claro)."""
     st.html(
         f"""
         <style>
-        [data-testid="stAppViewContainer"] {{ background: {VERDE}; }}
+        [data-testid="stAppViewContainer"] {{ background: {VINHO}; }}
         [data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"],
         [data-testid="stAppViewContainer"] [data-testid="stHeading"] *,
         [data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] * {{
@@ -332,7 +346,7 @@ def fundo_verde_login() -> None:
         /* Um pouco de respiro no topo — sem isso, barras/extensões do
         próprio navegador (fora do nosso controle) às vezes cobrem a logo. */
         [data-testid="stMainBlockContainer"] {{
-            padding-top: 2.5rem;
+            padding-top: 4.5rem;
             padding-bottom: 1rem;
         }}
         </style>
@@ -340,16 +354,17 @@ def fundo_verde_login() -> None:
     )
 
 
-# Segunda parte do nome do app, ao lado de "Ficha" (ver _titulo). Trocar aqui
-# muda o nome mostrado no topo e na tela de login.
-MARCA = "Base"
+# Nome do app: PREFIXO + MARCA em destaque (ver _titulo). Trocar aqui muda o
+# nome mostrado no topo e na tela de login.
+PREFIXO = "Fichas"
+MARCA = "Brava"
 
 
 def _marca(cor: str) -> str:
     """Parte destacada do nome, em caixa e com fundo da cor da marca."""
-    fundo, texto = (DOURADO, "#1A1A1A") if cor == "dourado" else ("#FFFFFF", VERDE) if cor == "claro" else (VERDE, "#FFFFFF")
+    fundo, texto = (DOURADO, "#1A1A1A") if cor == "dourado" else ("#FFFFFF", VINHO) if cor == "claro" else (VINHO, "#FFFFFF")
     return (
-        f'<span style="background:{fundo};color:{texto};padding:0 0.35em;'
+        f'<span style="background:{fundo};color:{texto} !important;padding:0 0.35em;'
         f'border-radius:0.15em;letter-spacing:0.12em;">{MARCA.upper()}</span>'
     )
 
@@ -359,16 +374,52 @@ def _titulo(icone_svg: str, cor_marca: str, tamanho: str, estilo_div: str = "", 
     return (
         f'<div class="fh-logo" style="font-size:{tamanho};{estilo_div}">'
         f"{icone_svg}"
-        f'<span class="fh-logo-texto" style="{cor}">Ficha</span>'
+        f'<span class="fh-logo-texto" style="{cor}">{PREFIXO}</span>'
         f"{_marca(cor_marca)}"
         f"</div>"
     )
 
 
+# Logo da casa (arquivo de imagem). Se existir, substitui o título em texto
+# no login e na barra lateral; sem o arquivo, o app usa "Fichas BRAVA" em texto.
+_PASTA_ASSETS = Path(__file__).resolve().parent.parent.parent / "assets"
+_NOMES_LOGO = ("logo_brava.png", "logo_brava.jpg", "logo_brava.jpeg", "logo_brava.svg")
+_MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml"}
+
+
+@lru_cache
+def _logo_data_uri() -> str | None:
+    """Imagem embutida em base64 — o st.markdown não serve arquivos locais."""
+    for nome in _NOMES_LOGO:
+        caminho = _PASTA_ASSETS / nome
+        if caminho.exists():
+            dados = base64.b64encode(caminho.read_bytes()).decode()
+            return f"data:{_MIME[caminho.suffix.lower()]};base64,{dados}"
+    return None
+
+
+def _cartao_logo(data_uri: str, largura: str, legenda: str = "") -> str:
+    """A logo é escura sobre branco: vai num cartão branco para aparecer
+    tanto no fundo vinho do login quanto na barra lateral."""
+    legenda_html = (
+        f'<div class="fh-logo-legenda">{legenda}</div>'
+        if legenda else ""
+    )
+    return (
+        f'<div style="background:#FFFFFF;border-radius:14px;padding:0.6rem 0.9rem;'
+        f'text-align:center;max-width:{largura};margin:0 auto 1rem;">'
+        f'<img src="{data_uri}" style="width:100%;height:auto;" alt="{MARCA}"/>'
+        f"{legenda_html}</div>"
+    )
+
+
 def logo_centralizada() -> None:
     """Logo grande e centralizada, usada acima do formulário de login
-    (fundo verde) — versão maior e com cores claras da `logo()` normal, que é
+    (fundo vinho) — versão maior e com cores claras da `logo()` normal, que é
     pensada pro fundo branco do restante do app."""
+    if data_uri := _logo_data_uri():
+        st.markdown(_cartao_logo(data_uri, "340px", "FICHAS TÉCNICAS"), unsafe_allow_html=True)
+        return
     st.markdown(
         _titulo(
             _ICONE_LOGO_LOGIN, "dourado", "2.6rem",
@@ -386,10 +437,14 @@ def esconder_sidebar() -> None:
 
 
 def logo(fundo_escuro: bool = True) -> None:
-    """Título "Ficha" + marca. Na sidebar (fundo escuro) a marca sai clara; no
-    conteúdo principal (fundo branco), verde."""
+    """Título "Fichas" + marca. Na sidebar (fundo escuro) a marca sai em
+    dourado; no conteúdo principal (fundo branco), vinho. O `!important` na
+    cor da marca vence a regra da sidebar que força texto claro em todo span."""
+    if fundo_escuro and (data_uri := _logo_data_uri()):
+        st.markdown(_cartao_logo(data_uri, "200px", "FICHAS"), unsafe_allow_html=True)
+        return
     st.markdown(
-        _titulo(_ICONE_LOGO, "claro" if fundo_escuro else "verde", "2rem", estilo_div="margin-bottom:0.25rem;"),
+        _titulo(_ICONE_LOGO, "dourado" if fundo_escuro else "vinho", "1.7rem", estilo_div="margin-bottom:0.25rem;"),
         unsafe_allow_html=True,
     )
 

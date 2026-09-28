@@ -80,11 +80,22 @@ Cloud](https://share.streamlit.io): aponte para este repositório e cadastre
 ## Personalização
 
 - **Nome do app:** `MARCA` em `src/fichabase/ui.py` (o título mostra
-  "Ficha" + a marca).
-- **Cores:** `.streamlit/config.toml` e as constantes `VERDE`/`DOURADO` em
+  "Fichas" + a marca).
+- **Cores:** `.streamlit/config.toml` e as constantes `VINHO`/`DOURADO` em
   `src/fichabase/ui.py`.
 - **Fotos das fichas:** por padrão ficam no banco; para usar o Storage do
   Supabase, veja `src/fichabase/storage.py`.
+
+## Importar fichas da cozinha (planilhas do chef)
+
+Planilhas no modelo "FICHA TÉCNICA OPERACIONAL" (uma ficha por aba):
+
+```bash
+.venv\Scripts\python scripts/importar_fichas_brava.py "<pasta com os .xlsx>" --autor <email>
+```
+
+Nome final, categoria e grafia dos insumos ficam no de-para do script. Fichas
+que já existem são puladas, então dá para rodar de novo sem duplicar.
 
 ## Mudanças no banco
 
