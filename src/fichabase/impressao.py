@@ -90,7 +90,7 @@ def html_impressao(
     if validades:
         itens_validade = "".join(f"<li>{escape(rotulo)}: <b>{escape(dias)}</b></li>" for rotulo, dias in validades)
         blocos += ["<h2>Validade</h2>", f'<ul class="validade">{itens_validade}</ul>']
-    blocos.append('<div class="rodape">FichaBase · Grupo HosT</div>')
+    blocos.append('<div class="rodape">FichaBase</div>')
 
     return f"""<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8">

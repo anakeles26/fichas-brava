@@ -24,7 +24,7 @@ with get_session() as session:
 
     st.title("Alérgenos")
     st.caption(
-        "Catálogo compartilhado por todo o Grupo HosT (não é por empresa) — "
+        "Catálogo compartilhado por todas as unidades (não é por empresa) — "
         "usado para marcar quais alérgenos cada ficha técnica contém."
     )
 

@@ -13,7 +13,8 @@ import unicodedata
 
 import streamlit as st
 
-# Paleta "Metas Batidas" do Grupo HosT — verde escuro + dourado, substituindo
+# Paleta padrão do app — verde escuro + dourado. Trocar aqui (e no
+# .streamlit/config.toml) muda as cores de todo o sistema.
 # o rosa/azul usado antes. Os nomes das variáveis mudaram (ROSA->VERDE,
 # AZUL->DOURADO) mas as classes CSS .fh-badge-rosa/.fh-badge-azul mantiveram
 # o nome antigo de propósito: são só chaves internas usadas em dezenas de
@@ -249,10 +250,10 @@ def aplicar_estilo() -> None:
         }}
         .fh-badge .fh-icon {{ margin-right: 3px; }}
 
-        /* Título "Ficha" + marca HOST. Flex com a imagem encolhível: a
+        /* Título "Ficha" + marca. Flex com o texto encolhível: a
         largura da sidebar muda com a tela/zoom do navegador, e com tamanho
         fixo a marca era cortada. O ícone e o "Ficha" não encolhem; a marca
-        HOST ocupa o que sobrar (até a altura máxima), mantendo a proporção. */
+        marca ocupa o que sobrar, mantendo a proporção. */
         .fh-logo {{
             display: flex;
             align-items: center;
@@ -385,9 +386,8 @@ def esconder_sidebar() -> None:
 
 
 def logo(fundo_escuro: bool = True) -> None:
-    """Título "Ficha" + marca HOST. Na sidebar (fundo escuro) a marca é clara,
-    mesma cor que o CSS da sidebar já dava ao texto "HosT"; no conteúdo
-    principal (fundo branco) é verde, a cor original do "HosT"."""
+    """Título "Ficha" + marca. Na sidebar (fundo escuro) a marca sai clara; no
+    conteúdo principal (fundo branco), verde."""
     st.markdown(
         _titulo(_ICONE_LOGO, "claro" if fundo_escuro else "verde", "2rem", estilo_div="margin-bottom:0.25rem;"),
         unsafe_allow_html=True,

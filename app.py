@@ -63,7 +63,7 @@ elif status is None:
     fundo_verde_login()
     with topo_login.container():
         logo_centralizada()
-    st.caption("Fichas técnicas do Grupo HosT")
+    st.caption("Sistema de fichas técnicas")
     st.stop()
 
 # Log de acessos: uma linha por sessão (não por página). O flag na sessão

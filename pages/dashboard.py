@@ -13,7 +13,7 @@ with get_session() as session:
         st.stop()
 
     empresa = empresa_atual(session, usuario)
-    st.title(f"Dashboard — {empresa.nome if empresa else 'Grupo HosT'}")
+    st.title(f"Dashboard — {empresa.nome}" if empresa else "Dashboard")
 
     if empresa is None:
         st.info("Nenhuma empresa vinculada a este usuário ainda. Fale com o admin.")

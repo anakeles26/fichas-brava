@@ -4,8 +4,9 @@ Sistema de **fichas técnicas de cozinha**: cadastro de insumos, fichas com
 ingredientes, sub-receitas, modo de preparo, alérgenos, foto e impressão, mais
 o controle de usuários e a trilha de auditoria.
 
-Nasceu do FichaHosT (Grupo HosT), sem as partes específicas daquele grupo:
-não tem bar, auditorias de ficha, rendimentos nem padrão de porção.
+Um sistema por empresa (ou uma empresa com várias unidades), pensado para
+restaurantes: quem cozinha consulta a ficha pronta e a gerência controla o
+cadastro.
 
 ## O que o app tem
 

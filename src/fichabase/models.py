@@ -1,4 +1,4 @@
-"""Modelo de dados multi-tenant: cada operação do grupo é uma `Empresa`, e os
+"""Modelo de dados multi-tenant: cada unidade é uma `Empresa`, e os
 dados operacionais (insumos, receitas, categorias, logs) pertencem a
 exatamente uma empresa. `Alergeno` é a exceção: catálogo global compartilhado
 por todas as empresas (é uma lista fixa de tipos de alérgeno, não um dado
@@ -209,7 +209,7 @@ class PassoPreparo(Base):
 
 class Alergeno(Base):
     """Catálogo global de alérgenos (não é por empresa — é a mesma lista pra
-    todo o grupo, como nos rótulos regulatórios de alimentos)."""
+    todas as unidades, como nos rótulos regulatórios de alimentos)."""
 
     __tablename__ = "alergenos"
 

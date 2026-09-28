@@ -26,7 +26,7 @@ _EXEMPLOS = [
     ("pão bao", "un", "Padaria"),
 ]
 
-# Variações que aparecem nas planilhas do grupo -> unidade usada no sistema.
+# Variações que aparecem nas planilhas -> unidade usada no sistema.
 UNIDADE_MAP = {
     "kg": "kg", "quilo": "kg", "quilos": "kg", "kilo": "kg",
     "g": "g", "gr": "g", "grama": "g", "gramas": "g",

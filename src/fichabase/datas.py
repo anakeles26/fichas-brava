@@ -1,7 +1,8 @@
-"""Data e hora no fuso de Fortaleza (UTC-3, sem horário de verão).
+"""Data e hora no fuso local (UTC-3, sem horário de verão).
 
 O servidor (Streamlit Cloud) roda em UTC: sem isso, depois das 21h o app
 sugeriria a data do dia seguinte e o log de acessos mostraria a hora errada.
+Outro fuso: troque FUSO_LOCAL abaixo.
 """
 
 from __future__ import annotations

@@ -24,6 +24,7 @@ from fichabase.db import get_session
 from fichabase.models import PAPEL_LABELS, Acesso, Usuario
 
 SEM_ACESSO = "Nunca acessou"
+TODAS_UNIDADES = "Todas as unidades"  # admin master não pertence a uma unidade fixa
 
 
 def _norm(texto: str) -> str:
@@ -74,7 +75,7 @@ with get_session() as session:
         st.info("Escolha também a data final do período.")
         st.stop()
     inicio, fim = periodo
-    # criado_em é UTC: o dia em Fortaleza termina 3h depois (21h UTC vira o dia seguinte).
+    # criado_em é UTC: o dia local termina 3h depois (21h UTC vira o dia seguinte).
     inicio_utc = dt.datetime.combine(inicio, dt.time.min) - FUSO_LOCAL.utcoffset(None)
     fim_utc = dt.datetime.combine(fim, dt.time.max) - FUSO_LOCAL.utcoffset(None)
 
@@ -119,7 +120,7 @@ with get_session() as session:
                     "ID": u.id,
                     "Nome": u.nome,
                     "E-mail": u.email,
-                    "Unidade": u.empresa.nome if u.empresa else "Grupo HosT",
+                    "Unidade": u.empresa.nome if u.empresa else TODAS_UNIDADES,
                     "Cargo": PAPEL_LABELS.get(u.papel, u.papel),
                     "Último acesso": (
                         _local(ultimo_de[u.id]).strftime("%d/%m/%Y %H:%M") if u.id in ultimo_de else SEM_ACESSO
@@ -149,7 +150,7 @@ with get_session() as session:
                     "Data e hora": _local(a.criado_em).strftime("%d/%m/%Y %H:%M"),
                     "Nome": a.usuario.nome,
                     "E-mail": a.usuario.email,
-                    "Unidade": a.empresa.nome if a.empresa else "Grupo HosT",
+                    "Unidade": a.empresa.nome if a.empresa else TODAS_UNIDADES,
                     "Cargo": PAPEL_LABELS.get(a.usuario.papel, a.usuario.papel),
                 }
                 for a in acessos
