@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* Paleta do Fichas Brava — a mesma do app Streamlit (src/fichabase/ui.py).
+   Vira classes do Tailwind: bg-vinho, text-dourado, border-vinho-claro... */
+@theme {
+  --color-vinho: #6d1a2b;
+  --color-vinho-escuro: #3d0a16;
+  --color-vinho-hover: #8c2438;
+  --color-vinho-claro: #f6e4e8;
+  --color-dourado: #c9a961;
+  --color-dourado-claro: #f5ead3;
+  --color-dourado-escuro: #8a6d1f;
+  --color-fundo: #faf7f5;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-fundo);
+  color: #1a1a1a;
+}
