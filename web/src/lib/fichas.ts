@@ -10,12 +10,14 @@ export type FichaResumo = {
   rendimento_qtd: number;
   rendimento_unidade: string;
   verificada: boolean;
+  alergenos: string[];
 };
 
 export type FichaCompleta = FichaDados & {
   categoria: string | null;
   verificada: boolean;
   observacoes: string | null;
+  criado_em: string;
   validade_congelado_dias: number | null;
   validade_refrigerado_dias: number | null;
   validade_ambiente_dias: number | null;
@@ -52,6 +54,7 @@ type LinhaResumo = {
   rendimento_unidade: string;
   verificada: boolean;
   categoria: { nome: string } | null;
+  ficha_alergenos: { alergeno: { nome: string } | null }[];
 };
 
 /** Fichas ativas da casa da pessoa logada (a RLS filtra a casa), em ordem alfabética. */
@@ -59,7 +62,9 @@ export async function listarFichas(): Promise<FichaResumo[]> {
   const supabase = await criarClienteServidor();
   const { data, error } = await supabase
     .from("fichas")
-    .select("id, nome, rendimento_qtd, rendimento_unidade, verificada, categoria:categorias(nome)")
+    .select(
+      "id, nome, rendimento_qtd, rendimento_unidade, verificada, categoria:categorias(nome), ficha_alergenos(alergeno:alergenos(nome))",
+    )
     .eq("ativa", true)
     .order("nome")
     .returns<LinhaResumo[]>();
@@ -71,6 +76,7 @@ export async function listarFichas(): Promise<FichaResumo[]> {
     rendimento_qtd: Number(f.rendimento_qtd),
     rendimento_unidade: f.rendimento_unidade,
     verificada: f.verificada,
+    alergenos: f.ficha_alergenos.map((fa) => fa.alergeno?.nome).filter((n): n is string => !!n),
   }));
 }
 
@@ -85,6 +91,7 @@ type LinhaFicha = {
 type LinhaFichaCompleta = LinhaFicha & {
   verificada: boolean;
   observacoes: string | null;
+  criado_em: string;
   validade_congelado_dias: number | null;
   validade_refrigerado_dias: number | null;
   validade_ambiente_dias: number | null;
@@ -115,7 +122,7 @@ export async function buscarFicha(
   const { data, error } = await supabase
     .from("fichas")
     .select(
-      `id, nome, rendimento_qtd, rendimento_unidade, verificada, observacoes,
+      `id, nome, rendimento_qtd, rendimento_unidade, verificada, observacoes, criado_em,
        validade_congelado_dias, validade_refrigerado_dias, validade_ambiente_dias,
        categoria:categorias(nome),
        ficha_alergenos(alergeno:alergenos(nome, icone)),
@@ -147,6 +154,7 @@ export async function buscarFicha(
     categoria: data.categoria?.nome ?? null,
     verificada: data.verificada,
     observacoes: data.observacoes,
+    criado_em: data.criado_em,
     validade_congelado_dias: data.validade_congelado_dias,
     validade_refrigerado_dias: data.validade_refrigerado_dias,
     validade_ambiente_dias: data.validade_ambiente_dias,

@@ -5,16 +5,57 @@
 @theme {
   --color-vinho: #6d1a2b;
   --color-vinho-escuro: #3d0a16;
+  --color-vinho-botao: #460b19;
   --color-vinho-hover: #8c2438;
   --color-vinho-claro: #f6e4e8;
   --color-dourado: #c9a961;
-  --color-dourado-claro: #f5ead3;
-  --color-dourado-escuro: #8a6d1f;
-  --color-fundo: #faf7f5;
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --color-texto-lateral: #e7e9ee;
+  --color-placeholder: #f1f3f6;
+  --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background: var(--color-fundo);
+  background: #ffffff;
   color: #1a1a1a;
+}
+
+/* Ícones Material Symbols — a mesma fonte de ícones que o Streamlit usa no app antigo. */
+.icone {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.15em;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: -0.2em;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Selos (.fh-badge-* do app antigo). */
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.selo-vinho { background: #f6e4e8; color: #6d1a2b; }
+.selo-dourado { background: #f5ead3; color: #8a6d1f; }
+.selo-verde { background: #dcf3e3; color: #1e8449; }
+.selo-amarelo { background: #fcf0d9; color: #92710a; }
+
+/* Quadro azul de observações (st.info do Streamlit). */
+.quadro-info {
+  background: rgba(28, 131, 225, 0.1);
+  color: rgb(0, 66, 128);
+  border-radius: 0.5rem;
+  padding: 1rem;
 }

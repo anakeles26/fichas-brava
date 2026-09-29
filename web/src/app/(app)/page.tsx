@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { contarCozinha } from "@/lib/fichas";
 import { perfilLogado } from "@/lib/sessao";
 
@@ -10,20 +9,17 @@ export default async function Dashboard() {
 
   return (
     <>
-      <h1 className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 className="mb-4 text-3xl leading-tight font-bold md:text-[44px]">
         Dashboard{perfil?.empresa ? ` — ${perfil.empresa}` : ""}
       </h1>
-      <section className="rounded-xl border border-gray-200 p-5 sm:p-6">
-        <h2 className="text-lg font-semibold">Cozinha</h2>
-        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <Link href="/fichas" className="group">
-            <p className="text-sm text-gray-600">Fichas técnicas ativas</p>
-            <p className="mt-1 text-4xl text-vinho-escuro group-hover:text-vinho">{numeros.fichasAtivas}</p>
-          </Link>
-          <div>
-            <p className="text-sm text-gray-600">Insumos cadastrados</p>
-            <p className="mt-1 text-4xl text-vinho-escuro">{numeros.insumos}</p>
-          </div>
+      <section className="grid grid-cols-1 gap-4 rounded-lg border border-black/20 p-4 sm:grid-cols-2">
+        <div>
+          <p className="text-sm">Fichas técnicas ativas</p>
+          <p className="text-4xl">{numeros.fichasAtivas}</p>
+        </div>
+        <div>
+          <p className="text-sm">Insumos cadastrados</p>
+          <p className="text-4xl">{numeros.insumos}</p>
         </div>
       </section>
     </>
