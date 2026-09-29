@@ -30,7 +30,7 @@ export function Ingredientes({ itens, rendimentoQtd, rendimentoUnidade }: Props)
   }
 
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+    <section className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5">
       <div className="mb-4 rounded-xl bg-vinho-claro p-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold text-vinho-escuro">Multiplicar receita</span>

@@ -4,7 +4,7 @@
 // tentar de novo, em vez da tela de erro padrão.
 export default function Erro({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <div className="mx-auto max-w-md rounded-2xl bg-white p-6 text-center shadow">
+    <div className="mx-auto max-w-md rounded-2xl border border-gray-200 p-6 text-center">
       <h1 className="text-lg font-semibold">Não foi possível carregar</h1>
       <p className="mt-2 text-gray-600">Verifique a conexão e tente novamente.</p>
       <button

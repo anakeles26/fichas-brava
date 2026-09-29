@@ -8,7 +8,7 @@ export default async function PaginaFichas() {
   const fichas = await listarFichas();
   return (
     <>
-      <h1 className="mb-4 text-2xl font-bold text-vinho-escuro">Fichas técnicas</h1>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl">Fichas Técnicas</h1>
       <ListaFichas fichas={fichas} />
     </>
   );

@@ -37,7 +37,7 @@ export async function proxy(request: NextRequest) {
   }
   if (user && paginaPublica) {
     const destino = request.nextUrl.clone();
-    destino.pathname = "/fichas";
+    destino.pathname = "/";
     destino.search = "";
     return redirecionar(destino, resposta);
   }

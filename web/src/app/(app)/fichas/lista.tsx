@@ -53,14 +53,14 @@ export function ListaFichas({ fichas }: { fichas: FichaResumo[] }) {
       </p>
 
       {visiveis.length === 0 ? (
-        <p className="rounded-xl bg-white p-6 text-center text-gray-600 shadow-sm">Nenhuma ficha encontrada.</p>
+        <p className="rounded-xl border border-gray-200 p-6 text-center text-gray-600">Nenhuma ficha encontrada.</p>
       ) : (
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visiveis.map((f) => (
             <li key={f.id}>
               <Link
                 href={`/fichas/${f.id}`}
-                className="flex h-full flex-col gap-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-vinho hover:shadow-md"
+                className="flex h-full flex-col gap-2 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-vinho hover:shadow-md"
               >
                 {f.categoria && (
                   <span className="self-start rounded-full bg-dourado-claro px-2.5 py-0.5 text-xs font-semibold text-dourado-escuro">

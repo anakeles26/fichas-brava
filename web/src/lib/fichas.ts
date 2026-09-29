@@ -33,6 +33,18 @@ const CAMPOS_ITENS =
 // um laço de consultas (a montagem da árvore já corta ciclos; isto limita a busca).
 const MAX_NIVEIS_SUB_RECEITA = 10;
 
+/** Números do Dashboard: fichas ativas e insumos da casa (a RLS filtra a casa). */
+export async function contarCozinha(): Promise<{ fichasAtivas: number; insumos: number }> {
+  const supabase = await criarClienteServidor();
+  const [fichas, insumos] = await Promise.all([
+    supabase.from("fichas").select("id", { count: "exact", head: true }).eq("ativa", true),
+    supabase.from("insumos").select("id", { count: "exact", head: true }),
+  ]);
+  const erro = fichas.error ?? insumos.error;
+  if (erro) throw new Error(`Erro ao contar fichas e insumos: ${erro.message}`);
+  return { fichasAtivas: fichas.count ?? 0, insumos: insumos.count ?? 0 };
+}
+
 type LinhaResumo = {
   id: number;
   nome: string;

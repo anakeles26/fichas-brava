@@ -8,7 +8,7 @@ export type EstadoLogin = { erro: string | null };
 /** Só aceita voltar para uma página do próprio app ("/fichas/3"), nunca para outro site. */
 function destinoSeguro(proximo: FormDataEntryValue | null): string {
   const caminho = typeof proximo === "string" ? proximo : "";
-  return caminho.startsWith("/") && !caminho.startsWith("//") ? caminho : "/fichas";
+  return caminho.startsWith("/") && !caminho.startsWith("//") ? caminho : "/";
 }
 
 export async function entrar(_anterior: EstadoLogin, dados: FormData): Promise<EstadoLogin> {

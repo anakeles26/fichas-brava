@@ -37,7 +37,7 @@ export default async function PaginaFicha({ params }: PageProps<"/fichas/[id]">)
         ← Todas as fichas
       </Link>
 
-      <header className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+      <header className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5">
         <div className="flex flex-wrap gap-2">
           {ficha.categoria && (
             <span className="rounded-full bg-dourado-claro px-2.5 py-0.5 text-xs font-semibold text-dourado-escuro">
@@ -52,7 +52,7 @@ export default async function PaginaFicha({ params }: PageProps<"/fichas/[id]">)
             {ficha.verificada ? "Verificada" : "Não verificada"}
           </span>
         </div>
-        <h1 className="mt-2 text-2xl font-bold text-vinho-escuro sm:text-3xl">{ficha.nome}</h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{ficha.nome}</h1>
 
         {ficha.alergenos.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-2" aria-label="Alérgenos">
@@ -76,7 +76,7 @@ export default async function PaginaFicha({ params }: PageProps<"/fichas/[id]">)
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         <Ingredientes itens={itens} rendimentoQtd={ficha.rendimento_qtd} rendimentoUnidade={ficha.rendimento_unidade} />
 
-        <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+        <section className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5">
           <h2 className="mb-3 text-lg font-bold text-vinho-escuro">Modo de preparo</h2>
           {ficha.passos.length === 0 ? (
             <p className="text-gray-600">Sem modo de preparo cadastrado.</p>
@@ -99,7 +99,7 @@ export default async function PaginaFicha({ params }: PageProps<"/fichas/[id]">)
       </div>
 
       {ficha.observacoes && (
-        <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+        <section className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5">
           <h2 className="mb-2 text-lg font-bold text-vinho-escuro">Observações</h2>
           {/* Markdown sem HTML: o texto vem do cadastro, então nada de tag vira código na tela. */}
           <div className="text-gray-800 [&_em]:text-gray-500 [&_p]:mb-2 [&_strong]:text-vinho-escuro">
