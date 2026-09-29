@@ -23,8 +23,11 @@ export type FichaCompleta = FichaDados & {
   passos: { ordem: number; descricao: string; tempo_min: number | null }[];
 };
 
+// ficha_itens tem duas ligações com fichas (ficha_id = a ficha dona do item; sub_ficha_id =
+// a sub-receita usada). Sem dizer qual, a API do Supabase recusa com PGRST201 ("more than
+// one relationship"); aqui queremos os itens QUE PERTENCEM à ficha.
 const CAMPOS_ITENS =
-  "itens:ficha_itens(id, ordem, quantidade, observacao, sub_ficha_id, unidade_sub, insumo:insumos(nome, unidade))";
+  "itens:ficha_itens!ficha_itens_ficha_id_fkey(id, ordem, quantidade, observacao, sub_ficha_id, unidade_sub, insumo:insumos(nome, unidade))";
 
 // Sub-receita dentro de sub-receita tem limite para uma ficha mal cadastrada não virar
 // um laço de consultas (a montagem da árvore já corta ciclos; isto limita a busca).
