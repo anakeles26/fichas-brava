@@ -1,0 +1,12 @@
+{
+  "name": "fichas-brava-banco",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "vitest": "^5.0.2"
+  }
+}
