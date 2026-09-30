@@ -356,6 +356,28 @@ describe("papéis", () => {
   });
 });
 
+describe("log de acessos", () => {
+  test("cada pessoa grava só o próprio acesso; só quem edita lê; ninguém altera", async () => {
+    await como(db, COZINHA, async (tx) => {
+      await tx.query(`insert into public.acessos (empresa_id, usuario_id) values (1, '${COZINHA}')`);
+      const msg = await erro(tx, () =>
+        tx.query(`insert into public.acessos (empresa_id, usuario_id) values (1, '${GESTAO}')`),
+      );
+      expect(msg).toMatch(/row-level security/);
+      expect(await linhas(tx, "select 1 from public.acessos")).toHaveLength(0);
+    });
+    await db.exec(`insert into public.acessos (empresa_id, usuario_id) values (1, '${COZINHA}')`);
+    await como(db, GESTAO, async (tx) => {
+      expect(await linhas(tx, "select 1 from public.acessos")).toHaveLength(1);
+      expect((await tx.query("delete from public.acessos")).affectedRows).toBe(0);
+    });
+    await como(db, OUTRA_CASA, async (tx) => {
+      expect(await linhas(tx, "select 1 from public.acessos")).toHaveLength(0);
+    });
+    await db.exec("delete from public.acessos");
+  });
+});
+
 describe("log de auditoria", () => {
   test("não pode ser alterado nem apagado, nem gravado em nome de outra pessoa", async () => {
     await como(db, GESTAO, async (tx) => {

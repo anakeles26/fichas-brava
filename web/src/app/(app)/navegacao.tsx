@@ -23,6 +23,7 @@ const CONFIGURACOES: Item[] = [
   { href: "/alergenos", rotulo: "Alérgenos", icone: "warning" },
   { href: "/usuarios", rotulo: "Usuários", icone: "group" },
   { href: "/auditoria", rotulo: "Auditoria e Logs", icone: "history" },
+  { href: "/acessos", rotulo: "Log de acessos", icone: "login" },
   { href: "/importar", rotulo: "Importar planilha", icone: "upload_file" },
 ];
 
