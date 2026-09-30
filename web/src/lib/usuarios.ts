@@ -50,17 +50,18 @@ export async function listarUsuarios(eu: string): Promise<Usuario[]> {
 }
 
 /** Registra no log de auditoria (como o próprio gestor, pela RLS). Falha no log não desfaz a ação. */
-export async function registrarUsuario(
+export async function registrarLog(
   gestor: { id: string; empresaId: number },
-  acao: "criar" | "editar" | "inativar" | "reativar",
+  acao: "criar" | "editar" | "inativar" | "reativar" | "excluir",
+  entidade: "usuario" | "alergeno",
   descricao: string,
 ) {
   const supabase = await criarClienteServidor();
-  await supabase.from("log_auditoria").insert({
-    empresa_id: gestor.empresaId,
-    usuario_id: gestor.id,
-    acao,
-    entidade: "usuario",
-    descricao,
-  });
+  await supabase.from("log_auditoria").insert({ empresa_id: gestor.empresaId, usuario_id: gestor.id, acao, entidade, descricao });
 }
+
+export const registrarUsuario = (
+  gestor: { id: string; empresaId: number },
+  acao: "criar" | "editar" | "inativar" | "reativar",
+  descricao: string,
+) => registrarLog(gestor, acao, "usuario", descricao);
