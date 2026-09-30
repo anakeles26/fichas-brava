@@ -354,6 +354,22 @@ describe("log de auditoria", () => {
     });
   });
 
+  test("gestão registra ações sobre usuários; cozinha não", async () => {
+    await como(db, GESTAO, async (tx) => {
+      await tx.query(
+        `insert into public.log_auditoria (empresa_id, usuario_id, acao, entidade, descricao) values (1, '${GESTAO}', 'criar', 'usuario', 'Usuário novo')`,
+      );
+      expect(await linhas(tx, "select 1 from public.log_auditoria where entidade = 'usuario'")).toHaveLength(1);
+    });
+    await como(db, COZINHA, async (tx) => {
+      const msg = await erro(tx, () =>
+        tx.query(`insert into public.log_auditoria (empresa_id, usuario_id, acao, entidade, descricao) values (1, '${COZINHA}', 'criar', 'usuario', 'x')`),
+      );
+      expect(msg).toMatch(/row-level security/);
+    });
+    await db.exec("delete from public.log_auditoria");
+  });
+
   test("cozinha não lê o log", async () => {
     await db.exec(`
       insert into public.log_auditoria (empresa_id, usuario_id, acao, entidade, descricao)

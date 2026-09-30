@@ -20,6 +20,7 @@ const ITENS: Item[] = [
 // Grupo "Configurações" do app antigo — só a gestão vê.
 const CONFIGURACOES: Item[] = [
   { href: "/categorias", rotulo: "Categorias", icone: "sell" },
+  { href: "/usuarios", rotulo: "Usuários", icone: "group" },
   { href: "/importar", rotulo: "Importar planilha", icone: "upload_file" },
 ];
 
