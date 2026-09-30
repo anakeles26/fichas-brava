@@ -6,6 +6,9 @@ import { ListaFichas } from "./lista";
 export const metadata: Metadata = { title: "Fichas técnicas" };
 
 export default async function PaginaFichas() {
-  const [fichas, perfil] = await Promise.all([listarFichas(), perfilLogado()]);
-  return <ListaFichas fichas={fichas} empresa={perfil?.empresa ?? ""} />;
+  const perfil = await perfilLogado();
+  const gestao = perfil?.papel === "gestao";
+  // A gestão recebe também as inativas (filtro "Situação"); a cozinha, só as ativas.
+  const fichas = await listarFichas(gestao);
+  return <ListaFichas fichas={fichas} empresa={perfil?.empresa ?? ""} gestao={gestao} />;
 }

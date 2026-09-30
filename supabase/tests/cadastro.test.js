@@ -310,6 +310,17 @@ describe("importar planilha do chef", () => {
   });
 });
 
+describe("perfis", () => {
+  test("cada um lê os perfis da própria casa, não os da outra", async () => {
+    await como(db, COZINHA, async (tx) => {
+      expect((await linhas(tx, "select nome from public.perfis order by nome")).map((p) => p.nome)).toEqual(["Ana", "Cozinha"]);
+    });
+    await como(db, OUTRA_CASA, async (tx) => {
+      expect((await linhas(tx, "select nome from public.perfis")).map((p) => p.nome)).toEqual(["Outra"]);
+    });
+  });
+});
+
 describe("log de auditoria", () => {
   test("não pode ser alterado nem apagado, nem gravado em nome de outra pessoa", async () => {
     await como(db, GESTAO, async (tx) => {

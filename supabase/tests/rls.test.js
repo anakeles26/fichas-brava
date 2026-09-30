@@ -85,7 +85,12 @@ describe("cozinha (só leitura)", () => {
       expect(await linhas(tx, "select id from public.insumos")).toHaveLength(2);
       expect(await linhas(tx, "select nome from public.alergenos")).toHaveLength(1);
       expect(await linhas(tx, "select nome from public.empresas")).toEqual([{ nome: "Brava Wine" }]);
-      expect(await linhas(tx, "select papel from public.perfis")).toEqual([{ papel: "cozinha" }]);
+      // Perfis da própria casa (Entrega 2: nome de quem verificou); nunca os da outra casa.
+      expect((await linhas(tx, "select nome from public.perfis order by nome")).map((p) => p.nome)).toEqual([
+        "Cozinha",
+        "Ana",
+        "Ex-funcionário",
+      ].sort());
     });
   });
 

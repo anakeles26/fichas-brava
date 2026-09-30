@@ -4,6 +4,7 @@ import { Icone, iconeAlergeno, SemFoto, Selo } from "@/components/visual";
 import type { ItemComposicao } from "@/lib/composicao";
 import type { FichaCompleta } from "@/lib/fichas";
 import { formatarQuantidade } from "@/lib/quantidades";
+import { AcoesFicha } from "./acoes-ficha";
 import { PrepararReceita } from "./preparar";
 
 // Conteúdo da ficha completa, no formato do app Streamlit. Separado da página para a
@@ -24,8 +25,15 @@ const DATA_POR_EXTENSO = new Intl.DateTimeFormat("pt-BR", {
 
 const CARTAO = "rounded-lg border border-black/20";
 
-export function DetalheFicha({ ficha, itens }: { ficha: FichaCompleta; itens: ItemComposicao[] }) {
+const DATA_CURTA = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Fortaleza" });
+
+type Props = { ficha: FichaCompleta; itens: ItemComposicao[]; gestao?: boolean };
+
+export function DetalheFicha({ ficha, itens, gestao = false }: Props) {
   const validades = VALIDADES.filter(([campo]) => ficha[campo] !== null);
+  const verificacao = [ficha.verificada_por && `por ${ficha.verificada_por}`, ficha.verificada_em && `em ${DATA_CURTA.format(new Date(ficha.verificada_em))}`]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <article className="flex flex-col gap-4">
@@ -48,17 +56,25 @@ export function DetalheFicha({ ficha, itens }: { ficha: FichaCompleta; itens: It
 
       {/* Cartão de identificação */}
       <section className={`${CARTAO} flex flex-col gap-3 p-4`}>
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <Icone nome="restaurant" />
-            {ficha.nome}
-          </h1>
-          <p className="text-sm text-gray-500">Criada em {DATA_POR_EXTENSO.format(new Date(ficha.criado_em))}</p>
+        <div className="flex flex-wrap items-start gap-3">
+          <div className="mr-auto">
+            <h1 className="flex items-center gap-2 text-2xl font-bold">
+              <Icone nome="restaurant" />
+              {ficha.nome}
+            </h1>
+            <p className="text-sm text-gray-500">Criada em {DATA_POR_EXTENSO.format(new Date(ficha.criado_em))}</p>
+          </div>
+          {gestao && <AcoesFicha id={ficha.id} nome={ficha.nome} ativa={ficha.ativa} verificada={ficha.verificada} />}
         </div>
         <div className="flex flex-wrap gap-2">
+          {!ficha.ativa && (
+            <Selo cor="vinho" icone="block">
+              Inativa
+            </Selo>
+          )}
           {ficha.verificada ? (
             <Selo cor="verde" icone="check_circle">
-              Verificada
+              Verificada{verificacao && ` ${verificacao}`}
             </Selo>
           ) : (
             <Selo cor="amarelo" icone="error">

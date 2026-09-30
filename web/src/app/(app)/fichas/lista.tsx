@@ -19,10 +19,17 @@ function ordenados(valores: (string | null)[]) {
 
 // Busca, filtros e paginação rodam no navegador: são poucas dezenas de fichas, então
 // filtrar na hora (sem ir ao servidor a cada tecla) é mais rápido na bancada.
-export function ListaFichas({ fichas, empresa }: { fichas: FichaResumo[]; empresa: string }) {
+// Situação (só a gestão vê o filtro; para a cozinha a lista já vem só com as ativas).
+const SITUACOES = { ativas: "Ativas", inativas: "Inativas", todas: "Ativas e inativas" } as const;
+type Situacao = keyof typeof SITUACOES;
+
+type Props = { fichas: FichaResumo[]; empresa: string; gestao?: boolean };
+
+export function ListaFichas({ fichas, empresa, gestao = false }: Props) {
   const [busca, setBusca] = useState("");
   const [categoria, setCategoria] = useState(TODAS);
   const [alergeno, setAlergeno] = useState(TODAS);
+  const [situacao, setSituacao] = useState<Situacao>("ativas");
   const [pagina, setPagina] = useState(1);
 
   const categorias = useMemo(() => ordenados(fichas.map((f) => f.categoria)), [fichas]);
@@ -32,7 +39,8 @@ export function ListaFichas({ fichas, empresa }: { fichas: FichaResumo[]; empres
     (f) =>
       combina(f.nome, busca) &&
       (categoria === TODAS || f.categoria === categoria) &&
-      (alergeno === TODAS || f.alergenos.includes(alergeno)),
+      (alergeno === TODAS || f.alergenos.includes(alergeno)) &&
+      (situacao === "todas" || f.ativa === (situacao === "ativas")),
   );
   const totalPaginas = Math.max(1, Math.ceil(visiveis.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
@@ -46,12 +54,24 @@ export function ListaFichas({ fichas, empresa }: { fichas: FichaResumo[]; empres
 
   return (
     <>
-      <h1 className="text-3xl leading-tight font-bold md:text-[44px]">
-        Fichas Técnicas{empresa ? ` — ${empresa}` : ""}
-      </h1>
-      <p className="mb-4 text-gray-500">{visiveis.length} receita(s) encontrada(s)</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl leading-tight font-bold md:text-[44px]">
+            Fichas Técnicas{empresa ? ` — ${empresa}` : ""}
+          </h1>
+          <p className="mb-4 text-gray-500">{visiveis.length} receita(s) encontrada(s)</p>
+        </div>
+        {gestao && (
+          <Link
+            href="/fichas/nova"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-vinho px-5 py-2.5 text-sm font-semibold text-white hover:bg-vinho-hover"
+          >
+            <Icone nome="add" /> Nova ficha técnica
+          </Link>
+        )}
+      </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr_1fr]">
+      <div className={`mb-4 grid grid-cols-1 gap-2 ${gestao ? "sm:grid-cols-[2fr_1fr_1fr_1fr]" : "sm:grid-cols-[2fr_1fr_1fr]"}`}>
         <input
           type="search"
           value={busca}
@@ -72,6 +92,15 @@ export function ListaFichas({ fichas, empresa }: { fichas: FichaResumo[]; empres
             <option key={a}>{a}</option>
           ))}
         </select>
+        {gestao && (
+          <select value={situacao} onChange={(e) => filtrar(() => setSituacao(e.target.value as Situacao))} aria-label="Filtrar por situação" className={CAMPO}>
+            {Object.entries(SITUACOES).map(([valor, rotulo]) => (
+              <option key={valor} value={valor}>
+                {rotulo}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {daPagina.length === 0 ? (
@@ -88,11 +117,18 @@ export function ListaFichas({ fichas, empresa }: { fichas: FichaResumo[]; empres
                 )}
               </SemFoto>
               <h2 className="font-semibold leading-snug">{f.nome}</h2>
-              {!f.verificada && (
-                <span>
-                  <Selo cor="amarelo" icone="error">
-                    Não verificada
-                  </Selo>
+              {(!f.ativa || !f.verificada) && (
+                <span className="flex flex-wrap gap-2">
+                  {!f.ativa && (
+                    <Selo cor="vinho" icone="block">
+                      Inativa
+                    </Selo>
+                  )}
+                  {!f.verificada && (
+                    <Selo cor="amarelo" icone="error">
+                      Não verificada
+                    </Selo>
+                  )}
                 </span>
               )}
               <p className="text-sm text-gray-600">

@@ -10,12 +10,16 @@ export type FichaResumo = {
   rendimento_qtd: number;
   rendimento_unidade: string;
   verificada: boolean;
+  ativa: boolean;
   alergenos: string[];
 };
 
 export type FichaCompleta = FichaDados & {
   categoria: string | null;
   verificada: boolean;
+  verificada_em: string | null;
+  verificada_por: string | null; // nome de quem verificou
+  ativa: boolean;
   observacoes: string | null;
   criado_em: string;
   validade_congelado_dias: number | null;
@@ -53,21 +57,24 @@ type LinhaResumo = {
   rendimento_qtd: number;
   rendimento_unidade: string;
   verificada: boolean;
+  ativa: boolean;
   categoria: { nome: string } | null;
   ficha_alergenos: { alergeno: { nome: string } | null }[];
 };
 
-/** Fichas ativas da casa da pessoa logada (a RLS filtra a casa), em ordem alfabética. */
-export async function listarFichas(): Promise<FichaResumo[]> {
+/**
+ * Fichas da casa da pessoa logada (a RLS filtra a casa), em ordem alfabética. Só as ativas,
+ * a não ser que `incluirInativas` (gestão, para poder reativar).
+ */
+export async function listarFichas(incluirInativas = false): Promise<FichaResumo[]> {
   const supabase = await criarClienteServidor();
-  const { data, error } = await supabase
+  let consulta = supabase
     .from("fichas")
     .select(
-      "id, nome, rendimento_qtd, rendimento_unidade, verificada, categoria:categorias(nome), ficha_alergenos(alergeno:alergenos(nome))",
-    )
-    .eq("ativa", true)
-    .order("nome")
-    .returns<LinhaResumo[]>();
+      "id, nome, rendimento_qtd, rendimento_unidade, verificada, ativa, categoria:categorias(nome), ficha_alergenos(alergeno:alergenos(nome))",
+    );
+  if (!incluirInativas) consulta = consulta.eq("ativa", true);
+  const { data, error } = await consulta.order("nome").returns<LinhaResumo[]>();
   if (error) throw new Error(`Erro ao listar fichas: ${error.message}`);
   return data.map((f) => ({
     id: f.id,
@@ -76,6 +83,7 @@ export async function listarFichas(): Promise<FichaResumo[]> {
     rendimento_qtd: Number(f.rendimento_qtd),
     rendimento_unidade: f.rendimento_unidade,
     verificada: f.verificada,
+    ativa: f.ativa,
     alergenos: f.ficha_alergenos.map((fa) => fa.alergeno?.nome).filter((n): n is string => !!n),
   }));
 }
@@ -90,6 +98,9 @@ type LinhaFicha = {
 
 type LinhaFichaCompleta = LinhaFicha & {
   verificada: boolean;
+  verificada_em: string | null;
+  verificador: { nome: string } | null;
+  ativa: boolean;
   observacoes: string | null;
   criado_em: string;
   validade_congelado_dias: number | null;
@@ -111,18 +122,20 @@ function paraFichaDados(f: LinhaFicha): FichaDados {
 }
 
 /**
- * A ficha ativa com tudo o que a tela mostra, mais as sub-fichas que ela usa (em
- * qualquer nível), buscadas em lotes por nível. null = não existe, está inativa ou é
- * de outra casa (a RLS esconde) — a tela mostra "ficha não encontrada" nos três casos.
+ * A ficha com tudo o que a tela mostra, mais as sub-fichas que ela usa (em qualquer
+ * nível), buscadas em lotes por nível. null = não existe, é de outra casa (a RLS esconde)
+ * ou está inativa sem `incluirInativa` — a tela mostra "ficha não encontrada".
  */
 export async function buscarFicha(
   id: number,
+  incluirInativa = false,
 ): Promise<{ ficha: FichaCompleta; fichas: Map<number, FichaDados> } | null> {
   const supabase = await criarClienteServidor();
   const { data, error } = await supabase
     .from("fichas")
     .select(
-      `id, nome, rendimento_qtd, rendimento_unidade, verificada, observacoes, criado_em,
+      `id, nome, rendimento_qtd, rendimento_unidade, verificada, verificada_em, ativa, observacoes, criado_em,
+       verificador:perfis!fichas_verificada_por_fkey(nome),
        validade_congelado_dias, validade_refrigerado_dias, validade_ambiente_dias,
        categoria:categorias(nome),
        ficha_alergenos(alergeno:alergenos(nome, icone)),
@@ -130,10 +143,9 @@ export async function buscarFicha(
        ${CAMPOS_ITENS}`,
     )
     .eq("id", id)
-    .eq("ativa", true)
     .maybeSingle<LinhaFichaCompleta>();
   if (error) throw new Error(`Erro ao carregar a ficha: ${error.message}`);
-  if (!data) return null;
+  if (!data || (!data.ativa && !incluirInativa)) return null;
 
   const fichas = new Map<number, FichaDados>([[data.id, paraFichaDados(data)]]);
   let pendentes = idsDeSubFichas([data], fichas);
@@ -153,6 +165,9 @@ export async function buscarFicha(
     ...paraFichaDados(data),
     categoria: data.categoria?.nome ?? null,
     verificada: data.verificada,
+    verificada_em: data.verificada_em,
+    verificada_por: data.verificador?.nome ?? null,
+    ativa: data.ativa,
     observacoes: data.observacoes,
     criado_em: data.criado_em,
     validade_congelado_dias: data.validade_congelado_dias,
