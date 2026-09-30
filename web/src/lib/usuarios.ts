@@ -3,12 +3,12 @@ import "server-only";
 import { criarClienteAdmin } from "./supabase/admin";
 import { criarClienteServidor } from "./supabase/servidor";
 
-export type Papel = "gestao" | "cozinha";
-export const PAPEIS: Record<Papel, string> = { gestao: "Gestão", cozinha: "Cozinha" };
+import { type Papel, podeEditar } from "./papeis";
 
+export type { Papel };
 export type Usuario = { id: string; nome: string; email: string; papel: Papel; ativo: boolean; eu: boolean };
 
-/** Quem está logado, já confirmado como gestão ativa. null = não pode gerenciar usuários. */
+/** Quem está logado, já confirmado como admin master, admin ou líder ativo. null = não pode gerenciar usuários. */
 export async function gestorLogado() {
   const supabase = await criarClienteServidor();
   const {
@@ -20,9 +20,9 @@ export async function gestorLogado() {
     .select("id, empresa_id, nome, papel")
     .eq("id", user.id)
     .eq("ativo", true)
-    .eq("papel", "gestao")
     .maybeSingle();
-  return data ? { id: data.id as string, empresaId: data.empresa_id as number, nome: data.nome as string } : null;
+  if (!data || !podeEditar(data.papel as Papel)) return null;
+  return { id: data.id as string, empresaId: data.empresa_id as number, nome: data.nome as string, papel: data.papel as Papel };
 }
 
 /** Usuários da casa do gestor (RLS já limita à casa) com o e-mail do login. */

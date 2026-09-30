@@ -14,7 +14,7 @@ beforeAll(async () => {
       (1, 'Brava Wine', 'brava-wine'), (2, 'Outra Casa', 'outra-casa');
     insert into auth.users (id) values ('${GESTAO}'), ('${COZINHA}'), ('${OUTRA_CASA}');
     insert into public.perfis (id, empresa_id, nome, papel) values
-      ('${GESTAO}', 1, 'Ana', 'gestao'), ('${COZINHA}', 1, 'Cozinha', 'cozinha'), ('${OUTRA_CASA}', 2, 'Outra', 'gestao');
+      ('${GESTAO}', 1, 'Ana', 'admin'), ('${COZINHA}', 1, 'Cozinha', 'usuario'), ('${OUTRA_CASA}', 2, 'Outra', 'admin');
     insert into public.categorias (id, empresa_id, tipo, nome) overriding system value values
       (1, 1, 'insumo', 'Laticínios'), (2, 1, 'ficha', 'Molhos'), (3, 2, 'insumo', 'Da outra');
     insert into public.insumos (id, empresa_id, nome, unidade) overriding system value values
@@ -337,6 +337,21 @@ describe("perfis", () => {
     });
     await como(db, OUTRA_CASA, async (tx) => {
       expect((await linhas(tx, "select nome from public.perfis")).map((p) => p.nome)).toEqual(["Outra"]);
+    });
+  });
+});
+
+describe("papéis", () => {
+  const LIDER = "00000000-0000-0000-0000-00000000000f";
+  test("líder edita como a gestão; usuário só consulta", async () => {
+    await db.exec(`
+      insert into auth.users (id) values ('${LIDER}');
+      insert into public.perfis (id, empresa_id, nome, papel) values ('${LIDER}', 1, 'Líder', 'lider')`);
+    await como(db, LIDER, async (tx) => {
+      expect((await tx.query("select public.sou_gestao() as r")).rows[0].r).toBe(true);
+    });
+    await como(db, COZINHA, async (tx) => {
+      expect((await tx.query("select public.sou_gestao() as r")).rows[0].r).toBe(false);
     });
   });
 });

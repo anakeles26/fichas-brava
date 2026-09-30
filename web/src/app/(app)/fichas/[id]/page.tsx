@@ -12,7 +12,7 @@ const carregar = cache(async (idTexto: string) => {
   const id = Number(idTexto);
   if (!Number.isInteger(id) || id <= 0) return null;
   const perfil = await perfilLogado();
-  return buscarFicha(id, perfil?.papel === "gestao");
+  return buscarFicha(id, perfil?.gestao);
 });
 
 export async function generateMetadata({ params }: PageProps<"/fichas/[id]">): Promise<Metadata> {
@@ -24,5 +24,5 @@ export default async function PaginaFicha({ params }: PageProps<"/fichas/[id]">)
   const [resultado, perfil] = await Promise.all([carregar((await params).id), perfilLogado()]);
   if (!resultado) notFound();
   const { ficha, fichas } = resultado;
-  return <DetalheFicha ficha={ficha} itens={montarComposicao(ficha.id, fichas)} gestao={perfil?.papel === "gestao"} />;
+  return <DetalheFicha ficha={ficha} itens={montarComposicao(ficha.id, fichas)} gestao={perfil?.gestao} />;
 }

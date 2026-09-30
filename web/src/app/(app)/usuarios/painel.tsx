@@ -2,17 +2,14 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { Aviso, Expansor, ESTILO, Icone, Selo } from "@/components/visual";
+import { PAPEIS, type Papel } from "@/lib/papeis";
 import type { Usuario } from "@/lib/usuarios";
 import { alterarFuncao, criarUsuario, definirSenha, mudarAtivo, type ResultadoUsuario } from "./acoes";
 
 const INICIAL: ResultadoUsuario = { erro: null, ok: null };
-const FUNCOES = [
-  { valor: "gestao", rotulo: "Gestão" },
-  { valor: "cozinha", rotulo: "Cozinha" },
-];
 const REGRA = "Mínimo 6 caracteres, com pelo menos 1 letra e 1 número ou caractere especial.";
 
-export function PainelUsuarios({ usuarios }: { usuarios: Usuario[] }) {
+export function PainelUsuarios({ usuarios, permitidos }: { usuarios: Usuario[]; permitidos: Papel[] }) {
   const [aba, setAba] = useState<"ativos" | "inativos">("ativos");
   const ativos = usuarios.filter((u) => u.ativo);
   const inativos = usuarios.filter((u) => !u.ativo);
@@ -21,7 +18,7 @@ export function PainelUsuarios({ usuarios }: { usuarios: Usuario[] }) {
   return (
     <>
       <Expansor titulo="Novo usuário" icone="person_add">
-        <NovoUsuario />
+        <NovoUsuario permitidos={permitidos} />
       </Expansor>
 
       <div className="mt-6 mb-4 flex gap-6 border-b border-gray-200" role="tablist">
@@ -49,14 +46,14 @@ export function PainelUsuarios({ usuarios }: { usuarios: Usuario[] }) {
       <div className="flex flex-col gap-2">
         {lista.length === 0 && <p className="text-sm text-gray-500">Nenhum usuário {aba === "ativos" ? "ativo" : "inativo"}.</p>}
         {lista.map((u) => (
-          <LinhaUsuario key={u.id} usuario={u} />
+          <LinhaUsuario key={u.id} usuario={u} permitidos={permitidos} />
         ))}
       </div>
     </>
   );
 }
 
-function NovoUsuario() {
+function NovoUsuario({ permitidos }: { permitidos: Papel[] }) {
   const [estado, acao, enviando] = useActionState(criarUsuario, INICIAL);
   const [manual, setManual] = useState(false);
   return (
@@ -75,14 +72,14 @@ function NovoUsuario() {
       </div>
       <label className={ESTILO.rotulo}>
         Função
-        <select name="papel" defaultValue="cozinha" className={ESTILO.campo}>
-          {FUNCOES.map((f) => (
-            <option key={f.valor} value={f.valor}>
-              {f.rotulo}
+        <select name="papel" defaultValue={permitidos[permitidos.length - 1]} className={ESTILO.campo}>
+          {permitidos.map((p) => (
+            <option key={p} value={p}>
+              {PAPEIS[p]}
             </option>
           ))}
         </select>
-        <span className="text-xs text-gray-500">Gestão cadastra e edita; Cozinha só consulta.</span>
+        <span className="text-xs text-gray-500">Admin master, Admin e Líder cadastram e editam; Usuário só consulta.</span>
       </label>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="senha_manual" checked={manual} onChange={(e) => setManual(e.target.checked)} />
@@ -118,7 +115,8 @@ function NovoUsuario() {
   );
 }
 
-function LinhaUsuario({ usuario: u }: { usuario: Usuario }) {
+function LinhaUsuario({ usuario: u, permitidos }: { usuario: Usuario; permitidos: Papel[] }) {
+  const gerencia = u.eu || permitidos.includes(u.papel);
   const [pendente, iniciar] = useTransition();
   const [resultado, setResultado] = useState<ResultadoUsuario>(INICIAL);
   const [senha, setSenha] = useState("");
@@ -139,9 +137,10 @@ function LinhaUsuario({ usuario: u }: { usuario: Usuario }) {
           <strong>{u.nome}</strong> {u.eu && <span className="text-sm text-gray-500">(você)</span>}
           <p className="truncate text-sm text-gray-500">{u.email}</p>
         </div>
-        <Selo cor={u.papel === "gestao" ? "vinho" : "dourado"}>{u.papel === "gestao" ? "Gestão" : "Cozinha"}</Selo>
+        <Selo cor={u.papel === "usuario" ? "dourado" : "vinho"}>{PAPEIS[u.papel]}</Selo>
       </div>
 
+      {gerencia && (
       <Expansor titulo="Editar" icone="edit">
         <div className="flex flex-col gap-4">
           <div>
@@ -173,9 +172,9 @@ function LinhaUsuario({ usuario: u }: { usuario: Usuario }) {
                   onChange={(e) => rodar(() => alterarFuncao(u.id, e.target.value))}
                   className={`${ESTILO.campo} max-w-xs`}
                 >
-                  {FUNCOES.map((f) => (
-                    <option key={f.valor} value={f.valor}>
-                      {f.rotulo}
+                  {permitidos.map((p) => (
+                    <option key={p} value={p}>
+                      {PAPEIS[p]}
                     </option>
                   ))}
                 </select>
@@ -192,6 +191,7 @@ function LinhaUsuario({ usuario: u }: { usuario: Usuario }) {
           )}
         </div>
       </Expansor>
+      )}
       <Aviso {...resultado} />
     </div>
   );

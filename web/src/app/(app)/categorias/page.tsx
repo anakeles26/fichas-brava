@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Categorias" };
 
 export default async function PaginaCategorias() {
   const perfil = await perfilLogado();
-  if (perfil?.papel !== "gestao") {
+  if (!perfil?.gestao) {
     return <p className="text-gray-600">Esta tela é só para a gestão.</p>;
   }
   const categorias = await listarCategorias();

@@ -4,18 +4,16 @@ import { revalidatePath } from "next/cache";
 import { gerarSenhaProvisoria, REGRA_SENHA, senhaValida } from "@/lib/senha";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
-import { gestorLogado, PAPEIS, registrarUsuario, type Papel } from "@/lib/usuarios";
+import { PAPEIS, papelValido, podeGerenciar, type Papel } from "@/lib/papeis";
+import { gestorLogado, registrarUsuario } from "@/lib/usuarios";
 
 export type ResultadoUsuario = { erro: string | null; ok: string | null; senha?: string };
 
-const SOMENTE_GESTAO = "Só a gestão pode gerenciar usuários.";
+const SOMENTE_GESTAO = "Você não tem permissão para gerenciar usuários.";
+const SEM_HIERARQUIA = "Você não pode gerenciar alguém com função acima da sua.";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Login desativado não consegue entrar nem renovar a sessão (vale ~100 anos).
 const BANIDO = "876000h";
-
-function papelValido(valor: unknown): valor is Papel {
-  return typeof valor === "string" && valor in PAPEIS;
-}
 
 /** O alvo precisa ser da casa do gestor (a RLS já esconde as outras, mas a chave secreta ignora a RLS). */
 async function alvoDaCasa(id: string, empresaId: number) {
@@ -38,6 +36,7 @@ export async function criarUsuario(_anterior: ResultadoUsuario, dados: FormData)
   if (!nome) return { erro: "Informe o nome.", ok: null };
   if (!EMAIL.test(email)) return { erro: "Informe um e-mail válido.", ok: null };
   if (!papelValido(papel)) return { erro: "Escolha a função.", ok: null };
+  if (!podeGerenciar(gestor.papel, papel)) return { erro: SEM_HIERARQUIA, ok: null };
   if (manual) {
     if (senhaInformada !== confirmacao) return { erro: "As senhas não coincidem.", ok: null };
     if (!senhaValida(senhaInformada)) return { erro: `Senha fraca. ${REGRA_SENHA}`, ok: null };
@@ -76,6 +75,7 @@ export async function alterarFuncao(id: string, papel: string): Promise<Resultad
   if (id === gestor.id) return { erro: "Você não pode alterar a função da própria conta.", ok: null };
   const alvo = await alvoDaCasa(id, gestor.empresaId);
   if (!alvo) return { erro: "Usuário não encontrado.", ok: null };
+  if (!podeGerenciar(gestor.papel, alvo.papel) || !podeGerenciar(gestor.papel, papel)) return { erro: SEM_HIERARQUIA, ok: null };
 
   const { error } = await criarClienteAdmin().from("perfis").update({ papel }).eq("id", id).eq("empresa_id", gestor.empresaId);
   if (error) return { erro: "Não foi possível alterar a função.", ok: null };
@@ -91,6 +91,7 @@ export async function definirSenha(id: string, nova: string, confirmacao: string
   if (!senhaValida(nova)) return { erro: `Senha fraca. ${REGRA_SENHA}`, ok: null };
   const alvo = await alvoDaCasa(id, gestor.empresaId);
   if (!alvo) return { erro: "Usuário não encontrado.", ok: null };
+  if (id !== gestor.id && !podeGerenciar(gestor.papel, alvo.papel)) return { erro: SEM_HIERARQUIA, ok: null };
 
   const { error } = await criarClienteAdmin().auth.admin.updateUserById(id, { password: nova });
   if (error) return { erro: "Não foi possível trocar a senha.", ok: null };
@@ -104,6 +105,7 @@ export async function mudarAtivo(id: string, ativo: boolean): Promise<ResultadoU
   if (id === gestor.id) return { erro: "Você não pode desativar a própria conta.", ok: null };
   const alvo = await alvoDaCasa(id, gestor.empresaId);
   if (!alvo) return { erro: "Usuário não encontrado.", ok: null };
+  if (!podeGerenciar(gestor.papel, alvo.papel)) return { erro: SEM_HIERARQUIA, ok: null };
 
   const admin = criarClienteAdmin();
   const { error } = await admin.from("perfis").update({ ativo }).eq("id", id).eq("empresa_id", gestor.empresaId);
