@@ -287,6 +287,26 @@ describe("importar planilha do chef", () => {
     });
   });
 
+  test("a mesma palavra pode ser apelido de prato e de ingrediente (caso ABACAXI)", async () => {
+    await como(db, GESTAO, async (tx) => {
+      await rpc(tx, "importar_planilha", {
+        arquivo: "x.xlsx",
+        fichas: [],
+        apelidos: [
+          { tipo: "prato", chave: "MOLHO", ficha_id: 1 },
+          { tipo: "ingrediente", chave: "MOLHO", insumo_id: 2 },
+        ],
+      });
+      expect(await linhas(tx, "select tipo, insumo_id, ficha_id from public.apelidos where chave = 'MOLHO' order by tipo")).toEqual([
+        { tipo: "ingrediente", insumo_id: 2, ficha_id: null },
+        { tipo: "prato", insumo_id: null, ficha_id: 1 },
+      ]);
+      expect(
+        await erro(tx, () => tx.query("insert into public.apelidos (empresa_id, tipo, chave, insumo_id) values (1, 'prato', 'X', 1)")),
+      ).toMatch(/apelidos_prato_e_ficha/);
+    });
+  });
+
   test("substituir mantém o id da ficha existente", async () => {
     await como(db, GESTAO, async (tx) => {
       const r = await rpc(tx, "importar_planilha", {

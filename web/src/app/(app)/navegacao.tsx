@@ -18,7 +18,10 @@ const ITENS: Item[] = [
 ];
 
 // Grupo "Configurações" do app antigo — só a gestão vê.
-const CONFIGURACOES: Item[] = [{ href: "/categorias", rotulo: "Categorias", icone: "sell" }];
+const CONFIGURACOES: Item[] = [
+  { href: "/categorias", rotulo: "Categorias", icone: "sell" },
+  { href: "/importar", rotulo: "Importar planilha", icone: "upload_file" },
+];
 
 function ativo(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
