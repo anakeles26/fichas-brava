@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Importar planilha" };
 
 export default async function PaginaImportar() {
   const perfil = await perfilLogado();
-  if (perfil?.papel !== "gestao") return <p className="text-gray-600">Esta tela é só para a gestão.</p>;
+  if (!perfil?.gestao) return <p className="text-gray-600">Esta tela é só para a gestão.</p>;
   const [opcoes, categorias] = await Promise.all([carregarOpcoesEditor(), listarCategorias()]);
   return (
     <>

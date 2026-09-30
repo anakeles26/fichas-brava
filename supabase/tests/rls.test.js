@@ -18,10 +18,10 @@ beforeAll(async () => {
     insert into auth.users (id) values
       ('${GESTAO}'), ('${COZINHA}'), ('${INATIVO}'), ('${OUTRA_CASA}'), ('${SEM_PERFIL}');
     insert into public.perfis (id, empresa_id, nome, papel, ativo) values
-      ('${GESTAO}', 1, 'Ana', 'gestao', true),
-      ('${COZINHA}', 1, 'Cozinha', 'cozinha', true),
-      ('${INATIVO}', 1, 'Ex-funcionário', 'gestao', false),
-      ('${OUTRA_CASA}', 2, 'Gestão outra', 'gestao', true);
+      ('${GESTAO}', 1, 'Ana', 'admin', true),
+      ('${COZINHA}', 1, 'Cozinha', 'usuario', true),
+      ('${INATIVO}', 1, 'Ex-funcionário', 'admin', false),
+      ('${OUTRA_CASA}', 2, 'Gestão outra', 'admin', true);
     insert into public.categorias (id, empresa_id, tipo, nome) overriding system value values
       (1, 1, 'ficha', 'Molhos e bases'), (2, 2, 'ficha', 'Molhos');
     insert into public.insumos (id, empresa_id, nome, unidade) overriding system value values
@@ -106,7 +106,7 @@ describe("cozinha (só leitura)", () => {
     ["criar passo", "insert into public.passos (ficha_id, ordem, descricao) values (1, 9, 'x')"],
     ["excluir passo", "delete from public.passos"],
     ["marcar alérgeno", "delete from public.ficha_alergenos"],
-    ["mudar o próprio papel", `update public.perfis set papel = 'gestao' where id = '${COZINHA}'`],
+    ["mudar o próprio papel", `update public.perfis set papel = 'admin' where id = '${COZINHA}'`],
   ])("não consegue %s", async (_, sql) => {
     await como(db, COZINHA, async (tx) => {
       expect(await recusado(tx, sql)).toBe(true);

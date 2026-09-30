@@ -7,7 +7,7 @@ export default async function LayoutApp({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col md:flex-row">
-      <Navegacao nome={perfil?.nome ?? "—"} empresa={perfil?.empresa ?? ""} gestao={perfil?.papel === "gestao"} sair={sair} />
+      <Navegacao nome={perfil?.nome ?? "—"} empresa={perfil?.empresa ?? ""} gestao={perfil?.gestao ?? false} sair={sair} />
       {/* Espaçamento do conteúdo igual ao do Streamlit: 96 px em cima, 80 px dos lados. */}
       <main className="w-full min-w-0 flex-1 px-4 py-6 sm:px-10 md:px-20 md:pt-24 md:pb-16">
         {perfil ? (

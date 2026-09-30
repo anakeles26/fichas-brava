@@ -3,8 +3,8 @@ logins do app novo.
 
 Uso:
     python scripts/migrar_para_supabase.py \
-        --usuario "anakelles@gmail.com|Ana Keles|gestao" \
-        --usuario "cozinha@exemplo.com|Cozinha Brava|cozinha"
+        --usuario "anakelles@gmail.com|Ana Keles|admin_master" \
+        --usuario "cozinha@exemplo.com|Cozinha Brava|usuario"
 
 Precisa no .env:
     SUPABASE_DB_URL            conexão direta do Postgres (usuário postgres)
@@ -40,7 +40,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 SQLITE = RAIZ / "fichas_brava.db"
 ARQUIVO_ACESSOS = RAIZ / "ACESSO_SUPABASE.txt"
 EMPRESA = ("Brava Wine", "brava-wine")
-PAPEIS = ("gestao", "cozinha")
+PAPEIS = ("admin_master", "admin", "lider", "usuario")
 
 # Tabelas com IDs copiados do SQLite: o contador automático precisa ser acertado depois
 # (senão o próximo cadastro tenta reusar um ID já ocupado).
@@ -260,7 +260,7 @@ def recusar_se_cadastro_no_app(conn: psycopg.Connection) -> None:
 def ler_usuario(texto: str) -> tuple[str, str, str]:
     partes = [p.strip() for p in texto.split("|")]
     if len(partes) != 3 or partes[2] not in PAPEIS or "@" not in partes[0]:
-        raise argparse.ArgumentTypeError('use "email|Nome|gestao" ou "email|Nome|cozinha"')
+        raise argparse.ArgumentTypeError('use "email|Nome|admin_master" ou "email|Nome|cozinha"')
     return partes[0], partes[1], partes[2]
 
 

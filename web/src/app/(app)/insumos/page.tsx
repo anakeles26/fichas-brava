@@ -13,7 +13,7 @@ export default async function PaginaInsumos() {
       <PainelInsumos
         insumos={insumos}
         categorias={categorias.filter((c) => c.tipo === "insumo")}
-        gestao={perfil?.papel === "gestao"}
+        gestao={perfil?.gestao ?? false}
       />
     </>
   );

@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Nova ficha técnica" };
 
 export default async function PaginaNovaFicha() {
   const perfil = await perfilLogado();
-  if (perfil?.papel !== "gestao") return <p className="text-gray-600">Só a gestão cria fichas.</p>;
+  if (!perfil?.gestao) return <p className="text-gray-600">Só a gestão cria fichas.</p>;
   const opcoes = await carregarOpcoesEditor();
   return (
     <>

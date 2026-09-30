@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Fichas técnicas" };
 
 export default async function PaginaFichas() {
   const perfil = await perfilLogado();
-  const gestao = perfil?.papel === "gestao";
+  const gestao = perfil?.gestao;
   // A gestão recebe também as inativas (filtro "Situação"); a cozinha, só as ativas.
   const fichas = await listarFichas(gestao);
   return <ListaFichas fichas={fichas} empresa={perfil?.empresa ?? ""} gestao={gestao} />;

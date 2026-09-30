@@ -2,10 +2,12 @@ import "server-only";
 
 import { cache } from "react";
 import { criarClienteServidor } from "./supabase/servidor";
+import { podeEditar, type Papel } from "./papeis";
 
-export type Perfil = { nome: string; papel: "gestao" | "cozinha"; empresa: string };
+/** gestao = pode cadastrar e editar (admin master, admin ou líder); false = só consulta. */
+export type Perfil = { nome: string; papel: Papel; gestao: boolean; empresa: string };
 
-type LinhaPerfil = { nome: string; papel: "gestao" | "cozinha"; empresa: { nome: string } | null };
+type LinhaPerfil = { nome: string; papel: Papel; empresa: { nome: string } | null };
 
 /**
  * Perfil de quem está logado, com o nome da casa. null quando o login existe no Supabase
@@ -25,5 +27,5 @@ export const perfilLogado = cache(async (): Promise<Perfil | null> => {
     .eq("id", user.id)
     .eq("ativo", true)
     .maybeSingle<LinhaPerfil>();
-  return data ? { nome: data.nome, papel: data.papel, empresa: data.empresa?.nome ?? "" } : null;
+  return data ? { nome: data.nome, papel: data.papel, gestao: podeEditar(data.papel), empresa: data.empresa?.nome ?? "" } : null;
 });
