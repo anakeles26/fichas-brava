@@ -29,7 +29,7 @@ Supabase é a única fonte de verdade e o app Streamlit é aposentado para cadas
 
 | Tabela | Colunas | Observações |
 |---|---|---|
-| `apelidos` | id, empresa_id, chave (texto normalizado), insumo_id **ou** ficha_id (exatamente um), criado_em | único por (empresa_id, chave). `chave` = sem acento, maiúsculas, espaços simples (mesma regra de `chave()` do leitor Python) |
+| `apelidos` | id, empresa_id, **tipo** (`ingrediente` \| `prato`), chave (texto normalizado), insumo_id **ou** ficha_id (exatamente um), criado_em | único por (empresa_id, tipo, chave). `chave` = sem acento, maiúsculas, espaços simples (mesma regra de `chave()` do leitor Python). *Revisto na implementação:* o tipo separa o nome do prato da aba (→ ficha existente, evita duplicar ao reenviar a planilha) do nome de ingrediente — a mesma palavra pode ter os dois papéis ("ABACAXI" no Executivo 1) |
 | `log_auditoria` | id, empresa_id, usuario_id, acao (`criar`/`editar`/`inativar`/`reativar`/`verificar`/`excluir`/`importar`), entidade (`ficha`/`insumo`/`categoria`/`planilha`), entidade_id, descricao, criado_em | só inserção; sem update/delete para ninguém pelo app |
 | `importacoes` | id, empresa_id, usuario_id, arquivo, fichas_criadas, fichas_substituidas, fichas_puladas, insumos_criados, apelidos_criados, criado_em | um registro por planilha importada |
 
@@ -146,7 +146,9 @@ biblioteca `exceljs` no servidor): procura rótulos em vez de linhas fixas; quan
 bruto; peso líquido diferente vai para a observação do item; modo de preparo juntado e
 repartido por frase e por rótulo de etapa; "1 -" é numeração, "40-50 MIN" não; observações
 montadas como no script (equipamentos, tempo, orientações, refrigeração); refrigeração em
-dias vira `validade_refrigerado_dias`; ovos em unidade, resto em gramas.
+dias vira `validade_refrigerado_dias`; ovos em unidade, resto em gramas. Rendimento com unidade ("5 A 6 LT") vira gramas pela média da faixa (1 l ≈ 1 kg), com aviso; sem número, a soma dos ingredientes.
+
+**Reconhecer o prato:** a aba é casada com as fichas por apelido de prato, nome igual ou nome parecido (≥ 0,75, com aviso); ficha reconhecida entra como "já cadastrada" (padrão: pular). O nome do produto corrigido na prévia vira apelido de prato.
 
 **Sugestão de parecido:** similaridade entre as `chave`s (distância de edição normalizada);
 sugere o melhor candidato com similaridade ≥ 0,6 entre insumos e fichas da casa.
