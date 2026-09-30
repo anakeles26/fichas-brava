@@ -158,9 +158,13 @@ sugere o melhor candidato com similaridade ≥ 0,6 entre insumos e fichas da cas
 
 Na publicação da **parte 2** (primeira que grava pelo app novo):
 
-1. Rodar `migrar_para_supabase.py` uma última vez.
-2. Travar o script: ele passa a recusar rodar se existir qualquer registro em
-   `log_auditoria` (sinal de que o app novo já gravou algo), com mensagem explicando o motivo.
+1. Rodar `migrar_para_supabase.py` uma última vez — **só se** o app local tiver mudado desde a
+   migração anterior (na virada de 30/09 não tinha: nenhum registro no log local depois de 28/09 e
+   contagens iguais; por isso não foi rodado).
+2. Travar o script: ele recusa rodar quando a migração `20260930000001_cadastro` já está aplicada.
+   *Revisto na implementação:* a trava original ("recusar se houver registro em `log_auditoria`")
+   não bastava — com o log ainda vazio, o script apagaria em cascata os apelidos e as categorias
+   de insumo criados pela própria Entrega 2.
 3. Supabase vira a fonte de verdade; o Streamlit fica só para consulta até ser desligado.
 
 Entre as partes 2 e 3, ajustes de ficha são feitos por mim direto no banco, com registro no log.

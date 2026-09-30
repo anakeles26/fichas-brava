@@ -239,6 +239,24 @@ def conferir(conn, empresa_id: int, dados: dict) -> bool:
     return tudo_ok
 
 
+MIGRACAO_CADASTRO = "20260930000001"  # Entrega 2: o cadastro passou a ser feito no app novo
+
+
+def recusar_se_cadastro_no_app(conn: psycopg.Connection) -> None:
+    """Trava da virada: com a Entrega 2 aplicada, o Supabase é a fonte oficial. Este script
+    apaga e regrava fichas, insumos e categorias — rodá-lo agora destruiria o que foi
+    cadastrado no app novo e, em cascata, os apelidos aprendidos na importação."""
+    aplicada = conn.execute(
+        "select exists (select 1 from supabase_migrations.schema_migrations where version = %s)",
+        (MIGRACAO_CADASTRO,),
+    ).fetchone()[0]
+    if aplicada:
+        sys.exit(
+            "Migração recusada: o cadastro agora é feito no app novo (Supabase é a fonte oficial).\n"
+            "Rodar este script apagaria fichas, insumos, categorias e apelidos cadastrados lá."
+        )
+
+
 def ler_usuario(texto: str) -> tuple[str, str, str]:
     partes = [p.strip() for p in texto.split("|")]
     if len(partes) != 3 or partes[2] not in PAPEIS or "@" not in partes[0]:
@@ -259,6 +277,7 @@ def main() -> None:
     dados = ler_sqlite(EMPRESA[0])
     print(f"Local: {len(dados['fichas'])} fichas, {len(dados['insumos'])} insumos.")
     with psycopg.connect(db_url) as conn:
+        recusar_se_cadastro_no_app(conn)
         empresa_id = gravar_supabase(conn, dados)
         if args.usuario:
             with conn.transaction():

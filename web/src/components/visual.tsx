@@ -43,6 +43,64 @@ export function SemFoto({ altura, children }: { altura: number; children?: React
   );
 }
 
+// Classes dos controles do cadastro, iguais aos do Streamlit (botão primário vinho,
+// secundário com borda, campo branco com foco vinho).
+export const ESTILO = {
+  botaoPrimario:
+    "inline-flex items-center justify-center gap-1.5 rounded-lg bg-vinho px-4 py-2 text-sm font-semibold text-white hover:bg-vinho-hover disabled:opacity-50",
+  botaoSecundario:
+    "inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm hover:border-vinho hover:text-vinho disabled:opacity-50",
+  botaoPerigo:
+    "inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#f5c2c0] bg-[#fdecec] px-4 py-2 text-sm text-[#b42318] hover:bg-[#fad7d5] disabled:opacity-50",
+  campo:
+    "h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-vinho focus:ring-2 focus:ring-vinho-claro",
+  rotulo: "flex flex-col gap-1 text-sm",
+  cartao: "rounded-lg border border-black/20",
+};
+
+/** Bloco que abre e fecha (st.expander do Streamlit). */
+export function Expansor({
+  titulo,
+  icone,
+  aberto = false,
+  children,
+}: {
+  titulo: string;
+  icone?: string;
+  aberto?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <details open={aberto} className="group rounded-lg border border-black/20">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm hover:text-vinho">
+        {icone && <Icone nome={icone} />}
+        <span className="flex-1">{titulo}</span>
+        <Icone nome="expand_more" className="transition group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-black/10 px-4 py-4">{children}</div>
+    </details>
+  );
+}
+
+/** Mensagem de erro ou de sucesso depois de uma gravação. */
+export function Aviso({ erro, ok }: { erro?: string | null; ok?: string | null }) {
+  if (erro) {
+    return (
+      <p role="alert" className="rounded-lg bg-[#fdecec] px-3 py-2 text-sm text-[#b42318]">
+        {erro}
+      </p>
+    );
+  }
+  if (ok) {
+    return (
+      <p role="status" className="rounded-lg bg-[#dcf3e3] px-3 py-2 text-sm text-[#1e8449]">
+        {ok}
+      </p>
+    );
+  }
+  return null;
+}
+
 // Ícone de cada alérgeno do catálogo (ICONES_ALERGENOS do app antigo).
 const ICONES_ALERGENOS: Record<string, string> = {
   amendoas: "nutrition",

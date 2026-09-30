@@ -9,18 +9,24 @@ import { Icone } from "@/components/visual";
 // Menu lateral igual ao do app Streamlit: vinho escuro, logo num cartão branco com
 // "FICHAS", saudação, casa, itens com ícone e "Sair" no pé. No celular vira gaveta (☰).
 
-const ITENS = [
+type Item = { href: string; rotulo: string; icone: string };
+
+const ITENS: Item[] = [
   { href: "/", rotulo: "Dashboard", icone: "dashboard" },
   { href: "/fichas", rotulo: "Fichas Técnicas", icone: "receipt_long" },
+  { href: "/insumos", rotulo: "Insumos", icone: "inventory_2" },
 ];
+
+// Grupo "Configurações" do app antigo — só a gestão vê.
+const CONFIGURACOES: Item[] = [{ href: "/categorias", rotulo: "Categorias", icone: "sell" }];
 
 function ativo(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-type Props = { nome: string; empresa: string; sair: () => Promise<void> };
+type Props = { nome: string; empresa: string; gestao: boolean; sair: () => Promise<void> };
 
-export function Navegacao({ nome, empresa, sair }: Props) {
+export function Navegacao({ nome, empresa, gestao, sair }: Props) {
   const pathname = usePathname();
   const [aberto, setAberto] = useState(false);
   const fechar = () => setAberto(false);
@@ -47,21 +53,17 @@ export function Navegacao({ nome, empresa, sair }: Props) {
       )}
 
       <nav className="mt-6 flex flex-col gap-0.5" aria-label="Menu principal">
-        {ITENS.map((item) => {
-          const atual = ativo(pathname, item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={fechar}
-              aria-current={atual ? "page" : undefined}
-              className={`flex h-8 items-center gap-2 rounded-md px-2 ${atual ? "bg-white/25 font-semibold" : "hover:bg-white/10"}`}
-            >
-              <Icone nome={item.icone} />
-              {item.rotulo}
-            </Link>
-          );
-        })}
+        {ITENS.map((item) => (
+          <LinkMenu key={item.href} item={item} atual={ativo(pathname, item.href)} aoClicar={fechar} />
+        ))}
+        {gestao && (
+          <>
+            <p className="mt-4 mb-1 px-2 text-sm font-semibold">Configurações</p>
+            {CONFIGURACOES.map((item) => (
+              <LinkMenu key={item.href} item={item} atual={ativo(pathname, item.href)} aoClicar={fechar} />
+            ))}
+          </>
+        )}
       </nav>
 
       <div className="mt-auto flex flex-col items-start gap-2 pt-10">
@@ -112,5 +114,19 @@ export function Navegacao({ nome, empresa, sair }: Props) {
         </div>
       )}
     </>
+  );
+}
+
+function LinkMenu({ item, atual, aoClicar }: { item: Item; atual: boolean; aoClicar: () => void }) {
+  return (
+    <Link
+      href={item.href}
+      onClick={aoClicar}
+      aria-current={atual ? "page" : undefined}
+      className={`flex h-8 items-center gap-2 rounded-md px-2 ${atual ? "bg-white/25 font-semibold" : "hover:bg-white/10"}`}
+    >
+      <Icone nome={item.icone} />
+      {item.rotulo}
+    </Link>
   );
 }
